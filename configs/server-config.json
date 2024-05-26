@@ -1,0 +1,7 @@
+{
+    "port": 4200,
+    "files": ["./node_modules/**/*.{html,htm,css,js}","./src/**/*.{html,htm,css,js}"],
+     "server": {
+       "index": "src/index.html"
+     }
+  }

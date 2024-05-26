@@ -1,0 +1,366 @@
+<div ng-controller="ColaboradorController" ng-init="carregarColaboradores()" class="container p-4 w-100">
+  <div class="container p-4">
+    <h3 class="text-center ">Gestão de Colaboradores</h3>
+    <div class="row mt-4 mb-4">
+      <div class="col-md-8">
+        <input
+          type="text"
+          class="form-control"
+          ng-model="searchTerm"
+          ng-change="pesquisarColaboradores()"
+          placeholder="Pesquisar colaboradores pelo nome..."
+        />
+      </div>
+      <div class="col-md-4 mt-3 mt-md-0">
+        <button class="btn btn-success w-100" ng-click="abrirModalCriar()">
+          Adicionar Colaborador
+        </button>
+      </div>
+    </div>
+
+    <!-- Cartões para dispositivos móveis -->
+    <div class="d-block d-md-none">
+      <div
+        ng-repeat="colaborador in colaboradores"
+        class="card mb-3 shadow-sm border-2 border-primary rounded border-2"
+      >
+        <div class="card-body p-4">
+          <h5 class="card-title text-center font-weight-bold">
+            {{ colaborador.nome }}
+          </h5>
+          <dl class="row">
+            <dt class="col-sm-4">CPF:</dt>
+            <dd class="col-sm-8">{{ colaborador.cpf }}</dd>
+
+            <dt class="col-sm-4">Data de Admissão:</dt>
+            <dd class="col-sm-8">{{ colaborador.dataAdmissao }}</dd>
+
+            <dt class="col-sm-4">Remuneração:</dt>
+            <dd class="col-sm-8">
+              {{ colaborador.remuneracao | currency:'R$ ' }}
+            </dd>
+
+            <dt class="col-sm-4">Cargo:</dt>
+            <dd class="col-sm-8">{{ colaborador.cargo.descricao }}</dd>
+          </dl>
+          <div class="d-grid gap-2 d-md-block">
+            <button
+              ng-click="editarColaborador(colaborador.id)"
+              class="btn btn-primary"
+            >
+              Editar
+            </button>
+            <button
+              ng-click="apagarColaborador(colaborador)"
+              class="btn btn-danger"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela para dispositivos maiores -->
+    <div class="table-responsive d-none d-md-block">
+      <table class="table table-striped">
+        <thead class="table-dark text-center">
+          <tr>
+            <th>CPF</th>
+            <th>Nome</th>
+            <th>Data de Admissão</th>
+            <th>Remuneração</th>
+            <th>Cargo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          <tr ng-repeat="colaborador in colaboradores">
+            <td>{{ colaborador.cpf }}</td>
+            <td>{{ colaborador.nome }}</td>
+            <td>{{ colaborador.dataAdmissao }}</td>
+            <td>{{ colaborador.remuneracao | currency:'R$ ' }}</td>
+            <td>{{ colaborador.cargo.descricao }}</td>
+            <td>
+              <button
+                ng-click="editarColaborador(colaborador.id)"
+                class="btn btn-sm btn-primary"
+              >
+                Editar
+              </button>
+              <button
+                ng-click="apagarColaborador(colaborador)"
+                class="btn btn-sm btn-danger"
+              >
+                Excluir
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-show="colaboradores.length === 0" class="text-center">
+      Nenhum colaborador encontrado.
+    </div>
+
+    <div
+      class="pagination-container d-flex justify-content-center align-items-center mt-4"
+    >
+      <button
+        ng-click="retrocederPagina()"
+        class="btn btn-secondary"
+        ng-disabled="currentPage <= 1"
+      >
+        Anterior
+      </button>
+      <span class="mx-3">Página {{ currentPage }}</span>
+      <button
+        ng-disabled="lastPageLoaded"
+        ng-click="avancarPagina()"
+        class="btn btn-secondary"
+      >
+        Próximo
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para Edição de Colaborador -->
+  <div
+    class="modal fade"
+    id="editColaboradorModal"
+    tabindex="-1"
+    aria-labelledby="editColaboradorModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editColaboradorModalLabel">
+            Editar Colaborador
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form ng-submit="salvarEdicao()">
+            <div class="mb-3">
+              <label for="cpf" class="form-label">CPF</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cpf"
+                ng-model="selectedColaborador.cpf"
+                required
+                mask="999.999.999-99"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="nome" class="form-label">Nome</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nome"
+                ng-model="selectedColaborador.nome"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="dataAdmissao" class="form-label"
+                >Data de Admissão</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="dataAdmissao"
+                ng-model="selectedColaborador.dataAdmissao"
+                required
+                mask="99/99/9999"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="remuneracao" class="form-label">Remuneração</label>
+              <input
+                type="text"
+                class="form-control"
+                id="remuneracao"
+                ng-model="selectedColaborador.remuneracao"
+                required
+                ui-money-mask
+                currency-symbol="R$"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="cargo">Cargo</label>
+              <select
+                class="form-control"
+                id="cargo"
+                ng-model="selectedColaborador.cargo"
+                ng-options="cargo as cargo.descricao for cargo in cargos track by cargo.id"
+              ></select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-click="salvarEdicao()"
+          >
+            Salvar Alterações
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Criação de Colaborador -->
+  <div
+    class="modal fade"
+    id="createColaboradorModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="createColaboradorModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createColaboradorModalLabel">
+            Criar Novo Colaborador
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form ng-submit="criarColaborador()">
+            <div class="form-group">
+              <label for="cpfCreate">CPF</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cpfCreate"
+                ng-model="novoColaborador.cpf"
+                required
+                mask="999.999.999-99"
+              />
+            </div>
+            <div class="form-group">
+              <label for="nomeCreate">Nome</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nomeCreate"
+                ng-model="novoColaborador.nome"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="dataAdmissaoCreate">Data de Admissão</label>
+              <input
+                class="form-control"
+                id="dataAdmissaoCreate"
+                ng-model="novoColaborador.dataAdmissao"
+                required
+                mask="99/99/9999"
+              />
+            </div>
+            <div class="form-group">
+              <label for="remuneracaoCreate">Remuneração</label>
+              <input
+                type="text"
+                class="form-control"
+                id="remuneracaoCreate"
+                ng-model="novoColaborador.remuneracao"
+                required
+                ui-money-mask
+                currency-symbol="R$"
+              />
+            </div>
+            <div class="form-group">
+              <label for="cargoCreate">Cargo</label>
+              <select
+                class="form-control"
+                id="cargoCreate"
+                ng-model="novoColaborador.cargoId"
+                required
+              >
+                <option ng-repeat="cargo in cargos" value="{{cargo.id}}">
+                  {{cargo.descricao}}
+                </option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">Criar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal de Confirmação de Exclusão -->
+  <div
+    class="modal fade"
+    id="deleteColaboradorModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="deleteColaboradorModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteColaboradorModalLabel">
+            Confirmar Exclusão
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Tem certeza de que deseja excluir o colaborador
+          {{selectedColaborador.nome}}? Esta ação não pode ser desfeita.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            ng-click="confirmarExclusao(selectedColaborador.id)"
+          >
+            Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

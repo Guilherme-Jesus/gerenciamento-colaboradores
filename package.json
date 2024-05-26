@@ -1,0 +1,30 @@
+{
+  "name": "gerenciamento-colaboradores",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "backend": "npx json-server configs/db.json",
+    "http-server": "lite-server -c configs/server-config.json",
+    "start": "concurrently --kill-others \"npm run backend\" \"npm run http-server\"",
+    "lint": "eslint ./app/**/*.js",
+    "format": "prettier --write \"./app/**/*.js\" \"./app/**/*.html\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "angular": "1.8.3",
+    "angular-input-masks": "^4.4.1",
+    "angular-resource": "^1.8.3",
+    "angular-route": "^1.8.3",
+    "bootstrap": "^5.3.3",
+    "concurrently": "8.2.2",
+    "lite-server": "2.6.1",
+    "ng-mask": "^3.1.1",
+    "rxjs": "7.5.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
