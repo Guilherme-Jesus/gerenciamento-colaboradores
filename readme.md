@@ -25,7 +25,7 @@ Este projeto foi desenvolvido com o objetivo é demonstrar minhas habilidades em
 Para executar este projeto localmente, siga os passos abaixo:
 
 1. Clone o repositório do projeto.
-2. Node versão LTS.
+2. Este projeto utilizo `nvm` para gerenciar as versões do Node.js, e utilizo a versão `v20.13.0`.
 2. Instale as dependências com o comando `npm install`.
 3. Inicie o servidor local com `npm start`. Isso irá subir a aplicação e o `json-server`.
 
