@@ -18,12 +18,13 @@ angular.module('GerenciamentoColaboradores').factory('ColaboradorService', [
     }
 
     function getColaboradores(pagina, quantidade, ignoreCache) {
-      if (!colaboradoresCache[pagina] || ignoreCache) {
-        colaboradoresCache[pagina] = $http
+      var cacheKey = `${pagina}-${quantidade}`
+      if (!colaboradoresCache[cacheKey] || ignoreCache) {
+        colaboradoresCache[cacheKey] = $http
           .get(`${apiUrl}colaboradores?_page=${pagina}&_per_page=${quantidade}`)
           .then((response) => response)
       }
-      return colaboradoresCache[pagina]
+      return colaboradoresCache[cacheKey]
     }
 
     function getColaboradorById(colaboradorId) {
@@ -94,8 +95,8 @@ angular.module('GerenciamentoColaboradores').factory('ColaboradorService', [
           (response) => {
             return getCargos(false).then((cargosData) => ({
               colaboradores: processarColaboradores(response.data, cargosData),
-              total: parseInt(response.headers('X-Total-Count')),
-              maxPerPage: parseInt(response.headers('X-Max-Per-Page')),
+              total: response.data.length,
+              maxPerPage: quantidade,
             }))
           }
         )
@@ -118,8 +119,8 @@ angular.module('GerenciamentoColaboradores').factory('ColaboradorService', [
                   response.data,
                   cargosData
                 ),
-                total: parseInt(response.headers('X-Total-Count')),
-                maxPerPage: parseInt(response.headers('X-Max-Per-Page')),
+                total: response.data.length,
+                maxPerPage: quantidade,
               }))
             })
             .then(deferred.resolve, deferred.reject)
